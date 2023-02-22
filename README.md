@@ -52,3 +52,7 @@
 12. Payment page
     # create payment page
     # save payment method in context
+13. Seed sample products in MongoDB
+    # add sample products to Mongodb
+    # display products at Home page and Product page
+    # check count in stock base on actual count in the Backend

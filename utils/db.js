@@ -1,4 +1,4 @@
-import mongoose, { connection } from "mongoose";
+import mongoose from "mongoose";
 
 const connectStatus = {};
 
@@ -31,5 +31,12 @@ async function disconnect() {
   }
 }
 
-const db = { connect, disconnect };
+function covertDocToObj(doc) {
+  doc._id = doc._id.toString()
+  doc.createdAt = doc.createdAt.toString()
+  doc.updatedAt = doc.updatedAt.toString()
+  return doc
+}
+
+const db = { connect, disconnect, covertDocToObj };
 export default db;
