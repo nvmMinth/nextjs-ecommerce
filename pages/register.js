@@ -2,59 +2,74 @@ import Link from "next/link";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Layout from "../components/Layout";
-import { signIn, useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import { getError } from "../utils/error";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 export default function Login() {
   // useSession
-  const { data: session } = useSession()
-
+  const { data: session } = useSession();
+  console.log(session);
   // Router
-  const router = useRouter()
-  console.log(router);
-  const { redirect } = router.query
-  console.log(redirect);
+  const router = useRouter();
+  const { redirect } = router.query;
   // useEffect
   useEffect(() => {
     if (session?.user) {
-      router.push(redirect || "/")
+      router.push(redirect || "/");
     }
-  }, [router, session, redirect])
+  }, [router, session, redirect]);
   // useForm
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm();
   // handle onSubmit
-  const onSubmit = async ({ email, password }) => {
-
+  const onSubmit = async ({ name, email, password }) => {
     try {
-      const result = await signIn('credentials', {
+      await axios.post("/api/auth/signup", { name, email, password });
+
+      const result = await signIn("credentials", {
         redirect: false,
         email,
-        password
-      })
+        password,
+      });
       if (result.error) {
-        toast.error(result.error)
+        toast.error(result.error);
       }
     } catch (error) {
-      toast.error(getError(error))
+      toast.error(getError(error));
     }
   };
   return (
-    <Layout title="Login">
+    <Layout title="Register">
       <form className="max-w-screen-md" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-xl mb-4">Login</h1>
+        <h1 className="text-xl mb-4">Create an account</h1>
+        <div className="mb-4">
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            className="w-full"
+            autoFocus
+            {...register("name", {
+              required: "Name required",
+            })}
+          />
+          {errors.name && (
+            <div className="text-red-500">{errors.name.message}</div>
+          )}
+        </div>
         <div className="mb-4">
           <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
             className="w-full"
-            autoFocus
             {...register("email", {
               required: "Email address required",
               pattern: {
@@ -73,7 +88,6 @@ export default function Login() {
             type="password"
             id="password"
             className="w-full"
-            autoFocus
             {...register("password", {
               required: "Password required",
               minLength: {
@@ -87,15 +101,26 @@ export default function Login() {
           )}
         </div>
         <div className="mb-4">
-          <button className="primary-button">Login</button>
+          <label htmlFor="password">Confirm password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            className="w-full"
+            {...register("confirmPassword", {
+              required: "Confirm your password",
+              validate: (value) => value === getValues("password"),
+              minLength: {
+                value: 6,
+                message: "Password does not match!",
+              },
+            })}
+          />
+          {errors.confirmPassword && (
+            <div className="text-red-500">{errors.confirmPassword.message}</div>
+          )}
         </div>
-        <div>
-          <p className="text-sm">
-            Do not have an account? &nbsp;
-            <Link href={`/register?redirect=${redirect || '/'}`} className="underline underline-offset-2">
-              Register now
-            </Link>
-          </p>
+        <div className="mb-4">
+          <button className="primary-button">Submit</button>
         </div>
       </form>
     </Layout>

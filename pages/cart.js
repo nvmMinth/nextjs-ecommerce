@@ -26,6 +26,14 @@ function Cart() {
       payload: { ...item, cartQty },
     });
   };
+  // round subtotal price to 2 decimal
+  const round2 = (number) => Math.round((number + Number.EPSILON) * 100) / 100;
+  const subtotal = round2(
+    state.cart.cartItems.reduce(
+      (total, item) => total + item.price * item.cartQty,
+      0
+    )
+  );
   return (
     <Layout title="Cart">
       <h1 className="text-xl mb-4">Shopping Cart</h1>
@@ -97,13 +105,7 @@ function Cart() {
                 )}
                 ):
               </li>
-              <li className="font-bold text-2xl text-center">
-                $
-                {state.cart.cartItems.reduce(
-                  (total, item) => total + item.cartQty * item.price,
-                  0
-                )}
-              </li>
+              <li className="font-bold text-2xl text-center">${subtotal}</li>
             </ul>
             <button
               onClick={() => router.push("login?redirect=/shipping")}

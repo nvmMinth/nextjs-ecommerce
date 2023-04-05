@@ -56,3 +56,21 @@
     # add sample products to Mongodb
     # display products at Home page and Product page
     # check count in stock base on actual count in the Backend
+14. Place Order Page
+    # display shipping address, order products, payment method
+    # implement create order
+15. Create Order Page
+    # implement backend api for order placed
+    # load and display order details from backend
+16. Register Page
+    # sign up api
+    # call api on form submit
+17. Pay by Paypal
+    # create backend api
+    # update order states
+18. Order history Page
+    # create api and the component
+    # fetch and display them
+19. Profile update page
+    # create profile page
+    # show and handle update user information
