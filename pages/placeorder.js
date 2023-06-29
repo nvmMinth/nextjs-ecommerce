@@ -14,15 +14,14 @@ const Placeorder = () => {
   // Context
   const { state, dispatch } = useContext(Store);
   const { shippingAddress, paymentMethod, cartItems } = state.cart;
-  // Prices
-  // round price to 2 decimal
+  // Prices//round to 2 decimal
   const round2 = (number) => Math.round((number + Number.EPSILON) * 100) / 100;
   const itemsPrice = round2(
     cartItems.reduce((total, item) => total + item.price * item.cartQty, 0)
   );
   const taxPrice = round2(itemsPrice * 0.15);
   const shippingPrice = itemsPrice > 200 ? 0 : 15;
-  const totalPrice = itemsPrice + taxPrice + shippingPrice;
+  const totalPrice = round2(itemsPrice + taxPrice + shippingPrice);
   // Router
   const router = useRouter();
   // useEffect

@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { getError } from "../utils/error";
 import Link from "next/link";
 
+// reducer
 const reducer = (state, action) => {
   switch (action.type) {
     case "FETCH_REQUEST":
@@ -52,21 +53,23 @@ const OrderHistory = () => {
           <table className="min-w-full">
             <thead className="border-b">
               <tr>
-                <th className="p-5 text-left">ID</th>
-                <th className="p-5 text-left">Date</th>
-                <th className="p-5 text-left">Total</th>
-                <th className="p-5 text-left">Paid</th>
-                <th className="p-5 text-left">Delivered</th>
-                <th className="p-5 text-left">Action</th>
+                <th className="p-5 text-center">ID</th>
+                <th className="p-5 text-center">Date</th>
+                <th className="p-5 text-center">Total</th>
+                <th className="p-5 text-center">Payment</th>
+                <th className="p-5 text-center">Paid</th>
+                <th className="p-5 text-center">Delivered</th>
+                <th className="p-5 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
               {state.orders.map((order) => (
                 <tr key={order._id} className="border-b">
-                  <td className="p-5">{order._id.substring(20, 24)}</td>
-                  <td className="p-5">{order.createdAt.substring(0, 10)}</td>
-                  <td className="p-5">${order.totalPrice}</td>
-                  <td className="p-5">
+                  <td className="p-5 text-center">{order._id.substring(20, 24)}</td>
+                  <td className="p-5 text-center">{order.createdAt.substring(0, 10)}</td>
+                  <td className="p-5 text-center">${order.totalPrice}</td>
+                  <td className="p-5 text-center">{order.paymentMethod}</td>
+                  <td className="p-5 text-center">
                     {order.isPaid
                       ? `Paid at ${order.paidAt.substring(0, 10)}`
                       : "Not paid"}

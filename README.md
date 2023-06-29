@@ -71,6 +71,33 @@
 18. Order history Page
     # create api and the component
     # fetch and display them
-19. Profile update page
+19. Profile update Page
     # create profile page
     # show and handle update user information
+    **\*\*\*\*** ADMIN PAGES **\*\*\*\***
+    # Update adminOnly access in \_app.js
+20. Admin dashboard Page
+    # create admin dropdown menu on Layout
+    # create dashboard page
+    # create admin summary-sales api
+21. Admin order list page
+    # create admin orders page
+    # create summary-orders api
+22. Admin deliver order
+    # create admin deliver api
+    # handle deliver order button in page order/[id]
+23. Admin products list summary
+    # create admin products page
+    # create products-summary api
+24. Product Edit page for Admin =>/// error
+    # create edit page and api for edit page
+    # show product info in form
+    # edit image: upload image - install cloudinary
+25. Create new product and delete product - admin/products
+    # add create product button
+    # handle create product api
+    # add delete product button
+    # handle delete product api
+26. List users and delete user - admin/users
+    # create user page and user api
+    # user api in page

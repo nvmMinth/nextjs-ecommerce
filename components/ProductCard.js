@@ -25,7 +25,7 @@ export default function ProductCard({ product }) {
         <img
           src={product.image}
           alt={product.name}
-          className="rounded shadow"
+          className="rounded shadow object-cover h-64 w-full"
         />
       </Link>
       <div className="flex flex-col p-5">

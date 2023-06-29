@@ -37,6 +37,14 @@ const reducer = (state, action) => {
         paypalPaid: false,
         paypalError: "",
       };
+    case "DELIVER_REQUEST":
+      return { ...state, loadingDeliver: true };
+    case "DELIVER_SUCCESS":
+      return { ...state, loadingDeliver: false, successDeliver: true };
+    case "DELIVER_FAIL":
+      return { ...state, loadingDeliver: false };
+    case "DELIVER_RESET":
+      return { ...state, loadingDeliver: false, successDeliver: false };
     default:
       return state;
   }
@@ -46,10 +54,8 @@ const reducer = (state, action) => {
 const OrderPlaced = () => {
   // paypal
   const [paypalState, paypalDispatch] = usePayPalScriptReducer();
-  /////paypalState: isPending
   // session
   const { data: session } = useSession();
-  console.log(session);
   // router
   const router = useRouter();
   const orderId = router.query.id;
@@ -63,7 +69,7 @@ const OrderPlaced = () => {
 
   // useReducer
   const [state, dispatch] = useReducer(reducer, initialState);
-  ///state: loading, error, order, paypalPayping, paypalPaid
+  ///=> state: loading, error, order, paypalPayping, paypalPaid, loadingDeliver, successDeliver
   console.log(state);
 
   //useEffect
@@ -82,11 +88,15 @@ const OrderPlaced = () => {
     if (
       !state.order._id ||
       (state.order._id && state.order._id !== orderId) ||
-      state.paypalPaid
+      state.paypalPaid ||
+      state.successDeliver
     ) {
       fetchOrder();
       if (state.paypalPaid) {
         dispatch({ type: "PAY_RESET" });
+      }
+      if (state.successDeliver) {
+        dispatch({ type: "DELIVER_RESET" });
       }
     } else {
       // load paypal script
@@ -106,7 +116,13 @@ const OrderPlaced = () => {
       };
       loadPaypalScript();
     }
-  }, [orderId, orderId, paypalDispatch, state.paypalPaid]);
+  }, [
+    orderId,
+    orderId,
+    paypalDispatch,
+    state.paypalPaid,
+    state.successDeliver,
+  ]);
 
   const {
     shippingAddress,
@@ -121,11 +137,9 @@ const OrderPlaced = () => {
     isDelivered,
     deliveredAt,
   } = state.order;
-  console.log(state);
 
   // createOrder function
   const createOrder = (data, actions) => {
-    console.log(actions);
     return actions.order
       .create({
         purchase_units: [{ amount: { value: state.order.totalPrice } }],
@@ -136,13 +150,12 @@ const OrderPlaced = () => {
   };
   // onApprove function
   const onApprove = (data, actions) => {
-    console.log(actions);
-    return actions.order.capture().then(async (details) => {
+    return actions.order.capture().then(async (captureDetails) => {
       try {
         dispatch({ type: "PAY_REQUEST" });
         const { data } = await axios.put(
           `/api/orders/${state.order._id}/pay`,
-          details
+          captureDetails
         );
         dispatch({
           type: "PAY_SUCCESS",
@@ -163,6 +176,21 @@ const OrderPlaced = () => {
     toast.error(getError(error));
   };
 
+  // deliver order function
+  const deliverOrderHandler = async () => {
+    try {
+      dispatch({ type: "DELIVER_REQUEST" });
+      const { data } = await axios.get(
+        `/api/admin/orders-summary/${state.order._id}/deliver`
+      );
+      dispatch({ type: "DELIVER_SUCCESS", payload: data });
+      toast.success("Order is delivered!");
+    } catch (error) {
+      dispatch({ type: "DELIVER_FAIL", payload: getError(error) });
+      toast.error(getError(error));
+    }
+  };
+
   return (
     <Layout title={`Order ${orderId}`}>
       <h1 className="text-xl mb-4">{`Order ${orderId}`}</h1>
@@ -181,7 +209,9 @@ const OrderPlaced = () => {
                 , {shippingAddress.country}
               </div>
               {isDelivered ? (
-                <div className="alert-success">Delivered at {deliveredAt}</div>
+                <div className="alert-success">
+                  Delivered at {new Date(deliveredAt).toString()}
+                </div>
               ) : (
                 <div className="alert-error">Not delivered</div>
               )}
@@ -190,7 +220,9 @@ const OrderPlaced = () => {
               <h2 className="text-lg mb-2">Payment method</h2>
               <div>{paymentMethod}</div>
               {isPaid ? (
-                <div className="alert-success">Paid at {paidAt}</div>
+                <div className="alert-success">
+                  Paid at {new Date(paidAt).toString()}
+                </div>
               ) : (
                 <div className="alert-error">Not paid</div>
               )}
@@ -250,10 +282,9 @@ const OrderPlaced = () => {
                   <div>Total</div>
                   <div>${totalPrice}</div>
                 </li>
-                {!isPaid && (
+                {!isPaid && paymentMethod === "Paypal" && (
                   <li>
                     <div className="w-full">
-                      Paypal
                       <PayPalButtons
                         createOrder={createOrder}
                         onApprove={onApprove}
@@ -263,6 +294,19 @@ const OrderPlaced = () => {
                     {state.paypalPaying && <div>Loading...</div>}
                   </li>
                 )}
+                {session.user.isAdmin &&
+                  ((paymentMethod === "Paypal" && isPaid) ||
+                    paymentMethod === "COD") &&
+                  !isDelivered && (
+                    <li>
+                      <button
+                        onClick={deliverOrderHandler}
+                        className="w-full primary-button"
+                      >
+                        Deliver Order
+                      </button>
+                    </li>
+                  )}
               </ul>
             </div>
           </div>

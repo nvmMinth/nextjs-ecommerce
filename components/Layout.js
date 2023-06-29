@@ -68,10 +68,20 @@ export default function Layout({ children, title }) {
                       </DropdownLink>
                     </Menu.Item>
                     <Menu.Item>
-                      <DropdownLink href="/history" className="dropdown-link">
+                      <DropdownLink href="/order-history" className="dropdown-link">
                         Order History
                       </DropdownLink>
                     </Menu.Item>
+                    {session.user.isAdmin && (
+                      <Menu.Item>
+                        <DropdownLink
+                          href="/admin/dashboard"
+                          className="dropdown-link"
+                        >
+                          Admin Dashboard
+                        </DropdownLink>
+                      </Menu.Item>
+                    )}
                     <Menu.Item>
                       <a
                         href="#"

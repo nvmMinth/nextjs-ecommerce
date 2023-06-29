@@ -16,7 +16,7 @@ const Payment = () => {
   // Router
   const router = useRouter();
   // Payment methods arr
-  const payments = ["Paypal", "Stripe", "CashOnDelivery"];
+  const payments = ["Paypal", "COD"];
   // handle onSubmit
   const submitHandler = (e) => {
     e.preventDefault();

@@ -11,9 +11,9 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <StoreProvider>
-        <PayPalScriptProvider deferLoading={true}>
+        <PayPalScriptProvider deferLoading={false}>
           {Component.auth ? (
-            <Auth>
+            <Auth adminOnly={Component.auth.adminOnly}>
               <Component {...pageProps} />
             </Auth>
           ) : (
@@ -25,7 +25,7 @@ export default function App({
   );
 }
 
-function Auth({ children }) {
+function Auth({ children, adminOnly }) {
   const router = useRouter();
   const { status, data: session } = useSession({
     required: true,
@@ -34,5 +34,8 @@ function Auth({ children }) {
     },
   });
   if (status === "loading") return <div>Loading...</div>;
+  if (adminOnly && !session.user.isAdmin) {
+    router.push("/unauthorized?message=login required")
+  }
   return children;
 }
