@@ -118,7 +118,7 @@ const OrderPlaced = () => {
     }
   }, [
     orderId,
-    orderId,
+    state.order._id,
     paypalDispatch,
     state.paypalPaid,
     state.successDeliver,
