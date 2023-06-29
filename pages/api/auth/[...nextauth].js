@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import db from "../../../utils/db";
 import User from "../../../models/User";
 
+
 export default NextAuth({
   session: {
     strategy: "jwt",
